@@ -5,10 +5,6 @@ services:
     user: root
     ports:
       - 9090:9090
-    volumes:
-      - ./config/prometheus:/etc/prometheus/
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yaml"
   grafana:
     image: grafana/grafana-oss:8.5.2
     ports:
