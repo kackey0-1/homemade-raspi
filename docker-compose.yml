@@ -1,0 +1,19 @@
+services:
+  ####################### Monitoring #######################
+  prometheus:
+    image: prom/prometheus:v2.35.0
+    user: root
+    ports:
+      - 9090:9090
+    volumes:
+      - ./config/prometheus:/etc/prometheus/
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+  grafana:
+    image: grafana/grafana-oss:8.5.2
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_DOMAIN=localhost
+
