@@ -1,0 +1,7 @@
+scrape_configs:
+  - job_name: node_monitoring
+    metrics_path: /metrics
+    scrape_interval: 2s
+    static_configs:
+      - targets: ['http://master:9100']
+        labels: "os_monitoring"
