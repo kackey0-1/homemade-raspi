@@ -1,0 +1,15 @@
+scrape_configs:
+  - job_name: prometheus_master_node
+    metrics_path: /metrics
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['master:9090']
+        labels:
+          application: "prometheus_master_node"
+  - job_name: node_os_metrics
+    metrics_path: /metrics
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['master:9100']
+        labels:
+          application: "node_os_metrics"
