@@ -1,0 +1,11 @@
+[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://kubernetes.io/docs/home/
+
+[Service]
+ExecStart=/usr/local/bin/kube-controller-manager \\
+  --config=/etc/kubernetes/manifests/kube-controller-manager.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

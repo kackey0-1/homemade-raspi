@@ -1,0 +1,11 @@
+---
+apt:
+  all_update_flag: True
+  all_upgrade_flag: True
+  packages:
+    - name: vim
+    - name: docker.io
+    - name: apt-transport-https
+    - name: curl
+    - name: net-tools
+    - name: prometheus-node-exporter
