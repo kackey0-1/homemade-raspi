@@ -1,0 +1,7 @@
+---
+apt:
+  packages:
+    - name: kubelet
+    - name: kubeadm
+    - name: kubectl
+

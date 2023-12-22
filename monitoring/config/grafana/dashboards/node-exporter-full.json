@@ -23680,11 +23680,6 @@
                 "useTags": false
             },
             {
-                "current": {
-                    "selected": false,
-                    "text": "192.168.11.61:9100",
-                    "value": "192.168.11.61:9100"
-                },
                 "datasource": {
                     "type": "prometheus",
                     "uid": "${datasource}"
