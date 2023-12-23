@@ -1,25 +1,25 @@
 ---
 - name: Add Kubernetes GPG key
   ansible.builtin.apt_key:
-  url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-  state: present
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
 
 - name: Add Kubernetes Repository
   ansible.builtin.apt_repository:
-  repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
-  state: present
-  filename: kubernetes
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes
 
 - name: Install kubelet, kubeadm and kubectl
   ansible.builtin.apt:
-  update_cache: yes
-  name: "{{ item.name }}"
-  state: latest
+    update_cache: yes
+    name: "{{ item.name }}"
+    state: latest
   with_items: '{{ kubernetes.packages }}'
 
 - name: Hold kubelet, kubeadm and kubectl at their current version
   ansible.builtin.apt:
-  name: "{{ item.name }}"
-  state: hold
+    name: "{{ item.name }}"
+    state: hold
   with_items: '{{ kubernetes.packages }}'
   
