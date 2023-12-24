@@ -5,21 +5,37 @@
     state: present
 
 - name: Add Kubernetes Repository
+  become: yes
+  become_user: root
   ansible.builtin.apt_repository:
     repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
     state: present
     filename: kubernetes
 
 - name: Install kubelet, kubeadm and kubectl
+  become: yes
+  become_user: root
   ansible.builtin.apt:
-    update_cache: yes
     name: "{{ item.name }}"
     state: latest
   with_items: '{{ kubernetes.packages }}'
 
 - name: Hold kubelet, kubeadm and kubectl at their current version
-  ansible.builtin.apt:
+  become: yes
+  become_user: root
+  ansible.builtin.dpkg_selections:
     name: "{{ item.name }}"
-    state: hold
+    selection: hold
   with_items: '{{ kubernetes.packages }}'
-  
+
+ - name: Disable swap
+  become: yes
+  become_user: root
+  command: dphys-swapfile swapoff
+
+- name: Disable dphys-swapfile unit
+  ansible.builtin.systemd_service:
+    name: dphys-swapfile
+    state: stopped
+    enabled: false
+

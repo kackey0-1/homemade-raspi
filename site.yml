@@ -1,4 +1,4 @@
-- hosts: kubernetes-master
+- hosts: kubernetes
   roles:
     - apt
     - kubernetes
