@@ -13,16 +13,13 @@ ansible-playbook site.yml -v --ask-pass -u ubuntu -i <host_name>
 memo
 
 ```bash
+# restart container runtime
 service containerd restart
+# restart kubelet
 service kubelet restart
 
 sudo vim /var/lib/kubelet/config.yaml
-
 containerd config default
-
-service containerd status
-service kubelet status 
 journalctl -xeu kubelet
-
 netstat -anp | grep LISTEN | grep tcp
 ```
