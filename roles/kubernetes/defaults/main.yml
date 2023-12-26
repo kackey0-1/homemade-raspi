@@ -1,0 +1,6 @@
+---
+kubernetes:
+  packages:
+    - name: kubelet=v1.25.1-00
+    - name: kubeadm=v1.25.1-00
+    - name: kubectl=v1.25.1-00
