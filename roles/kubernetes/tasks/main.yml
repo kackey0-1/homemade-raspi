@@ -28,7 +28,7 @@
     selection: hold
   with_items: '{{ kubernetes.packages }}'
 
- - name: Disable swap
+- name: Disable swap
   become: yes
   become_user: root
   command: dphys-swapfile swapoff

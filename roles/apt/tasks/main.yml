@@ -21,3 +21,9 @@
     name: '{{ item.name }}'
     state: '{{ item.state | default("present") }}'
   with_items: '{{ apt.packages }}'
+
+- name: apt clean up
+  become: yes
+  become_user: root
+  apt:
+    autoclean: true
