@@ -4,8 +4,9 @@ apt:
   all_upgrade_flag: True
   packages:
     - name: vim
-    - name: docker.io
+    # - name: linux-modules-extra-raspi
     - name: apt-transport-https
+    - name: ca-certificates
     - name: curl
     - name: net-tools
     - name: prometheus-node-exporter
