@@ -1,4 +1,56 @@
 ---
+# TODO check if this is needed
+- name: setup iptables
+  become: yes
+  become_user: root
+  ansible.builtin.shell: |
+    cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+    overlay
+    br_netfilter
+    EOF
+
+- name: setup iptables
+  become: yes
+  become_user: root
+  ansible.builtin.shell: |
+    modprobe overlay
+    modprobe br_netfilter
+    cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF
+    net.bridge.bridge-nf-call-iptables  = 1
+    net.bridge.bridge-nf-call-ip6tables = 1
+    net.ipv4.ip_forward                 = 1
+    EOF
+
+- name: apply iptable setting
+  become: yes
+  become_user: root
+  ansible.builtin.shell: |
+    sysctl --system
+
+- name: Disable swap
+  become: yes
+  become_user: root
+  command: dphys-swapfile swapoff
+
+- name: Disable dphys-swapfile unit
+  ansible.builtin.systemd_service:
+    name: dphys-swapfile
+    state: stopped
+    enabled: false
+
+- name: setup cgroup driver
+  become: yes
+  become_user: root
+  ansible.builtin.blockinfile:
+    prepend_newline: true
+    path: /boot/cmdline.txt
+    block: cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1
+
+- name: Add missing GPG key
+  ansible.builtin.apt_key:
+    url: "https://ftp.gwdg.de/pub/opensuse/repositories/devel:/kubic:/libcontainers:/stable/Debian_11/Release.key"
+    state: present
+
 - name: Add Kubernetes GPG key
   ansible.builtin.apt_key:
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -12,12 +64,32 @@
     state: present
     filename: kubernetes
 
+- name: Add CRI-O stable repository
+  ansible.builtin.apt_repository:
+    repo: deb https://ftp.gwdg.de/pub/opensuse/repositories/devel:/kubic:/libcontainers:/stable/Debian_11/ /
+    filename: devel:kubic:libcontainers:stable
+
+- name: Add CRI-O 1.25.1 repository
+  ansible.builtin.apt_repository:
+    repo: deb https://ftp.gwdg.de/pub/opensuse/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.25:/1.25.1/Debian_11/ /
+    filename: devel:kubic:libcontainers:stable:cri-o:1.25.1
+
+- name: Add CRI-O 1.25.1 Release key
+  ansible.builtin.apt_key:
+    url: https://ftp.gwdg.de/pub/opensuse/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.25:/1.25.1/Debian_11/Release.key
+    state: present
+
+- name: Add CRI-O stable Release key
+  ansible.builtin.apt_key:
+    url: https://ftp.gwdg.de/pub/opensuse/repositories/devel:/kubic:/libcontainers:/stable/Debian_11/Release.key
+    state: present
+
 - name: Install kubelet, kubeadm and kubectl
   become: yes
   become_user: root
   ansible.builtin.apt:
     name: "{{ item.name }}"
-    state: latest
+    version: "{{ item.version | default('') }}"
   with_items: '{{ kubernetes.packages }}'
 
 - name: Hold kubelet, kubeadm and kubectl at their current version
@@ -28,14 +100,5 @@
     selection: hold
   with_items: '{{ kubernetes.packages }}'
 
-- name: Disable swap
-  become: yes
-  become_user: root
-  command: dphys-swapfile swapoff
-
-- name: Disable dphys-swapfile unit
-  ansible.builtin.systemd_service:
-    name: dphys-swapfile
-    state: stopped
-    enabled: false
-
+- name: Unconditionally reboot the machine with all defaults
+  ansible.builtin.reboot:
