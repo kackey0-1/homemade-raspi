@@ -6,6 +6,7 @@ apt:
     - name: vim
     # - name: linux-modules-extra-raspi
     - name: apt-transport-https
+    - name: apt-show-versions
     - name: ca-certificates
     - name: curl
     - name: net-tools

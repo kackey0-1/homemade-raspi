@@ -89,7 +89,8 @@
   become_user: root
   ansible.builtin.apt:
     name: "{{ item.name }}"
-    version: "{{ item.version | default('') }}"
+    state: present
+    update_cache: yes
   with_items: '{{ kubernetes.packages }}'
 
 - name: Hold kubelet, kubeadm and kubectl at their current version
@@ -98,7 +99,7 @@
   ansible.builtin.dpkg_selections:
     name: "{{ item.name }}"
     selection: hold
-  with_items: '{{ kubernetes.packages }}'
+  with_items: '{{ kubernetes.hold_packages }}'
 
 - name: Unconditionally reboot the machine with all defaults
   ansible.builtin.reboot:
