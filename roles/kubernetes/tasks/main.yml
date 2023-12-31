@@ -38,14 +38,6 @@
     state: stopped
     enabled: false
 
-- name: setup cgroup driver
-  become: yes
-  become_user: root
-  ansible.builtin.blockinfile:
-    prepend_newline: true
-    path: /boot/cmdline.txt
-    block: cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1
-
 - name: Add missing GPG key
   ansible.builtin.apt_key:
     url: "https://ftp.gwdg.de/pub/opensuse/repositories/devel:/kubic:/libcontainers:/stable/Debian_11/Release.key"
@@ -89,7 +81,8 @@
   become_user: root
   ansible.builtin.apt:
     name: "{{ item.name }}"
-    version: "{{ item.version | default('') }}"
+    state: present
+    update_cache: yes
   with_items: '{{ kubernetes.packages }}'
 
 - name: Hold kubelet, kubeadm and kubectl at their current version
@@ -98,7 +91,23 @@
   ansible.builtin.dpkg_selections:
     name: "{{ item.name }}"
     selection: hold
-  with_items: '{{ kubernetes.packages }}'
+  with_items: '{{ kubernetes.hold_packages }}'
+
+- name: Enable crio unit
+  become: yes
+  become_user: root
+  ansible.builtin.systemd_service:
+    name: crio
+    state: started
+    enabled: true
+
+- name: setup cgroup driver
+  become: yes
+  become_user: root
+  ansible.builtin.blockinfile:
+    prepend_newline: true
+    path: /boot/cmdline.txt
+    block: cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1
 
 - name: Unconditionally reboot the machine with all defaults
   ansible.builtin.reboot:
