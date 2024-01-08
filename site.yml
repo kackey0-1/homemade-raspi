@@ -1,6 +1,5 @@
 - hosts: kubernetes
   roles:
     - apt
-    - kubernetes
     - hosts
-
+    - kubernetes
